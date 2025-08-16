@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
   "name": "Zen Tab Sorter",
-  "version": "1.5",
-  "description": "Sorts tabs in the current window alphabetically by URL (primary) and title (secondary). Trigger: Alt+S.",
-  "permissions": ["tabs"],
+  "version": "1.5.1",
+  "description": "Automatically sorts new tabs next to tabs with the same domain. Use Alt+S to sort all tabs by domain and title.",
+  "permissions": ["tabs", "tabGroups"],
   "background": {
     "scripts": ["background.js"],
     "persistent": false
@@ -13,14 +13,14 @@
       "suggested_key": {
         "default": "Alt+S"
       },
-      "description": "Sort tabs alphabetically by URL then title"
+      "description": "Sort all tabs and groups by domain then title"
     }
   },
   "icons": {
-   "48": "icons/icon-48.png",
-   "96": "icons/icon-96.png"
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
   },
   "browser_action": {
-    "default_title": "Sort tabs (Alt+S)"
+    "default_title": "Sort all tabs (Alt+S)"
   }
 }
