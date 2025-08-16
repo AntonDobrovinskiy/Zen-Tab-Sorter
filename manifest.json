@@ -1,9 +1,14 @@
 {
   "manifest_version": 2,
   "name": "Zen Tab Sorter",
-  "version": "1.5.1",
+  "version": "1.7",
   "description": "Automatically sorts new tabs next to tabs with the same domain. Use Alt+S to sort all tabs by domain and title.",
-  "permissions": ["tabs", "tabGroups"],
+  "permissions": [
+    "tabs",
+    "tabGroups",
+    "storage",
+    "commands"
+  ],
   "background": {
     "scripts": ["background.js"],
     "persistent": false
