@@ -1,11 +1,98 @@
 let groupState = {};
 
+function getEffectiveHostname(hostname) {
+  const lower = (hostname || '').toLowerCase();
+  if (!lower) return '';
+
+  // IP addresses or localhost
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(lower) || lower === 'localhost') {
+    return lower;
+  }
+
+  let host = lower.startsWith('www.') ? lower.slice(4) : lower;
+
+  // Handle common multi-part public suffixes (approximation without PSL dependency)
+  const multiPartSuffixes = [
+    'co.uk', 'org.uk', 'gov.uk', 'ac.uk',
+    'com.au', 'net.au', 'org.au',
+    'co.jp'
+  ];
+
+  for (const suffix of multiPartSuffixes) {
+    if (host.endsWith('.' + suffix)) {
+      const parts = host.split('.');
+      return parts.slice(-3).join('.');
+    }
+  }
+
+  const parts = host.split('.');
+  if (parts.length >= 2) {
+    return parts.slice(-2).join('.');
+  }
+  return host;
+}
+
 function getHost(tab) {
   try {
-    return new URL(tab.url).hostname;
+    const hostname = new URL(tab.url).hostname;
+    return getEffectiveHostname(hostname);
   } catch (e) {
-    return tab.url || '';
+    return (tab.url || '').toLowerCase();
   }
+}
+
+function normalizeUrlForDeduplication(rawUrl) {
+  try {
+    const u = new URL(rawUrl);
+    u.hash = '';
+    return u.href;
+  } catch (_) {
+    return rawUrl || '';
+  }
+}
+
+async function removeDuplicateTabs(windowId) {
+  try {
+    const tabs = await browser.tabs.query({ windowId });
+    const urlToTabs = new Map();
+
+    for (const tab of tabs) {
+      if (!tab.url) continue;
+      const key = normalizeUrlForDeduplication(tab.url);
+      if (!urlToTabs.has(key)) urlToTabs.set(key, []);
+      urlToTabs.get(key).push(tab);
+    }
+
+    const toClose = [];
+
+    for (const [, sameUrlTabs] of urlToTabs) {
+      if (sameUrlTabs.length <= 1) continue;
+
+      const pinnedTabs = sameUrlTabs.filter(t => t.pinned);
+      const unpinnedTabs = sameUrlTabs.filter(t => !t.pinned);
+
+      if (pinnedTabs.length > 0) {
+        // Never touch pinned. Remove all unpinned duplicates of the same URL.
+        for (const t of unpinnedTabs) {
+          toClose.push(t.id);
+        }
+        continue;
+      }
+
+      // No pinned: keep one unpinned by priority active > lowest index
+      let keep = unpinnedTabs.find(t => t.active);
+      if (!keep) keep = unpinnedTabs.slice().sort((a, b) => a.index - b.index)[0];
+      for (const t of unpinnedTabs) {
+        if (t.id !== keep.id) toClose.push(t.id);
+      }
+    }
+
+    if (toClose.length > 0) {
+      try {
+        await browser.tabs.remove(toClose);
+      } catch (err) { }
+    }
+  } catch (err) { }
 }
 
 async function updateGroupState(windowId) {
@@ -61,6 +148,7 @@ async function ensureUngroupedTabs(windowId, ungroupedTabIds) {
 
 async function sortTabsInWindow(windowId) {
   try {
+    await removeDuplicateTabs(windowId);
     const tabs = await browser.tabs.query({ windowId });
     const pinned = tabs.filter(t => t.pinned);
     const unpinned = tabs.filter(t => !t.pinned);
@@ -153,7 +241,7 @@ async function sortUngroupedTabs(unpinnedTabs, pinnedCount) {
     return (a.title || '').localeCompare((b.title || ''), undefined, { sensitivity: 'base' });
   }
 
-  const sortedUnpinned = [...unpinnedTabs].sort(tabCompare);
+    const sortedUnpinned = [...unpinnedTabs].sort(tabCompare);
   const currentOrderIds = unpinnedTabs.map(t => t.id);
   const sortedOrderIds = sortedUnpinned.map(t => t.id);
   const alreadySorted = currentOrderIds.every((id, i) => id === sortedOrderIds[i]);
