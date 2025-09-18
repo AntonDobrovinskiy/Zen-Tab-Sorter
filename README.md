@@ -1,22 +1,28 @@
----
 # Zen Tab Sorter
 
 Tabs everywhere? Breathe in, breathe out — and let Zen Tab Sorter line them up like disciplined little monks.
 
-## How It Works
+## What it does (while you pretend to be productive)
 
-Sorts groups and ungrouped tabs by domain and title when you ask nicely. Keeps your sanity intact by avoiding micromanagement settings.
+- Sorts groups and ungrouped tabs by domain and title when you ask nicely.
+- Keeps your sanity intact by avoiding micromanagement settings.
 
-## Installation
+Keyboard shortcut: press `Alt+S` to sort all tabs and groups by domain, then by title.
 
-This addon is available on the **Firefox Addons** store:
+## Install the calm
 
-[https://addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter/](https://addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter/)
+- Firefox Add-ons: [addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter](https://addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter/)
 
-## Contribution
+## Features (brief, like your attention span)
 
-If you find a bug or have an idea for an improvement, please feel free to open an issue or create a pull request on GitHub.
+- **Domain-aware sorting**: Groups subdomains and handles common multi-part TLDs.
+- **Lightweight**: No memory hoarding, no drama.
+- **One shortcut to rule them all**: `Alt+S`.
+
+## Contribute
+
+Bugs, ideas, or a burning desire to sort tabs by lunar phases? Issues and PRs welcome.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+MIT. Use it, remix it, achieve inner tab peace.
