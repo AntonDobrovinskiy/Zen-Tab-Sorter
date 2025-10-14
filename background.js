@@ -97,17 +97,23 @@ async function removeDuplicateTabs(windowId) {
 
 async function updateGroupState(windowId) {
   try {
-    const groups = await browser.tabGroups.query({ windowId });
-    groupState[windowId] = groupState[windowId] || {};
+    // To parallel await queries so foreach below would work faster
+    const [groups, allTabs] = await Promise.all([
+      browser.tabGroups.query({ windowId }),
+      browser.tabs.query({ windowId })
+    ]);
+    groupState[windowId] = {};
     for (const group of groups) {
-      const groupTabs = await browser.tabs.query({ groupId: group.id });
+      const groupTabs = allTabs.filter(tab => tab.groupId === group.id);
       groupState[windowId][group.id] = {
         title: group.title,
         tabIds: groupTabs.map(tab => tab.id),
         minIndex: groupTabs.length > 0 ? Math.min(...groupTabs.map(t => t.index)) : null,
       };
     }
-  } catch (err) { }
+  } catch (err) {
+    console.log('Ошибка updateGroupState', err)
+  }
 }
 
 async function autoSortNewTab(tab) {
