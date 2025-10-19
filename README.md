@@ -29,4 +29,4 @@ MIT. Use it, remix it, achieve inner tab peace.
 
 ## P.S. A Quick Note on Tab Groups
 
-For now, Zen Tab Sorter regards your tab groups like a wise monk watching the world's chaos—with understanding, but without interfering. In other words, he discards your tabs before sorting. Therefore, if you use tabs, it's better to refrain from using the extension. We're working on teaching it this particular form of zen (waiting for API from Zen creators). Until then, don't be alarmed if your groups are living their own life. Every tab has its own path to enlightenment.
+For now, Zen Tab Sorter regards your tab groups like a wise monk watching the world's chaos—with understanding, but without interfering. In other words, it doesn't sort them yet. We're working on teaching it this particular form of zen. Until then, don't be alarmed if your groups are living their own life. Every tab has its own path to enlightenment.
