@@ -1,28 +1,29 @@
 ---
 # Zen Tab Sorter
 
-An addon that organizes your tabs by domain.
+Tabs everywhere? Breathe in, breathe out — and let Zen Tab Sorter line them up like disciplined little monks.
 
-## How It Works
+## What it does (while you pretend to be productive)
 
-Zen Tab Sorter is an extremely simple but useful extension for anyone who works with a large number of tabs. It automatically moves newly opened tabs next to other tabs from the same domain. For example, if you open a new YouTube video, it will be placed next to your other YouTube tabs.
+- Sorts groups and ungrouped tabs by domain and title when you ask nicely.
+- Keeps your sanity intact by avoiding micromanagement settings.
 
-## Installation
+Keyboard shortcut: press `Alt+S` to sort all tabs and groups by domain, then by title.
 
-This addon is available on the **Firefox Addons** store:
+## Install the calm
 
-[https://addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter/](https://addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter/)
+- Firefox Add-ons: [addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter](https://addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter/)
 
-## Features
+## Features (brief, like your attention span)
 
-- **Automatic Sorting**: Newly opened tabs are automatically moved next to tabs with the same domain.
-- **Lightweight**: The addon is designed to be minimal and not consume system resources.
-- **Simple and Intuitive**: No complex settings or configurations are needed. It just works.
+- **Domain-aware sorting**: Groups subdomains and handles common multi-part TLDs.
+- **Lightweight**: No memory hoarding, no drama.
+- **One shortcut to rule them all**: `Alt+S`.
 
-## Contribution
+## Contribute
 
-If you find a bug or have an idea for an improvement, please feel free to open an issue or create a pull request on GitHub.
+Bugs, ideas, or a burning desire to sort tabs by lunar phases? Issues and PRs welcome.
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+MIT. Use it, remix it, achieve inner tab peace.
