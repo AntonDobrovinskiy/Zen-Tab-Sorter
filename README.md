@@ -1,4 +1,3 @@
----
 # Zen Tab Sorter
 
 Tabs everywhere? Breathe in, breathe out — and let Zen Tab Sorter line them up like disciplined little monks.
