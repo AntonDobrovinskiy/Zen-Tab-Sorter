@@ -26,3 +26,7 @@ Bugs, ideas, or a burning desire to sort tabs by lunar phases? Issues and PRs we
 ## License
 
 MIT. Use it, remix it, achieve inner tab peace.
+
+## P.S. A Quick Note on Tab Groups
+
+For now, Zen Tab Sorter regards your tab groups like a wise monk watching the world's chaos—with understanding, but without interfering. In other words, it doesn't sort them yet. We're working on teaching it this particular form of zen. Until then, don't be alarmed if your groups are living their own life. Every tab has its own path to enlightenment.
