@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zen Tab Sorter — Settings</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #333;
+      line-height: 1.6;
+    }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    h2 { font-size: 18px; margin-top: 32px; margin-bottom: 12px; }
+    .subtitle { color: #666; margin-bottom: 32px; }
+    .setting { margin-bottom: 16px; }
+    label { display: block; cursor: pointer; }
+    input[type="checkbox"] { margin-right: 8px; }
+    .description { font-size: 14px; color: #666; margin-top: 4px; }
+    .status { margin-top: 24px; padding: 12px; border-radius: 4px; display: none; }
+    .status.success { background: #e6fffa; color: #047857; display: block; }
+    .status.error { background: #fff5f5; color: #c53030; display: block; }
+    .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #eee; font-size: 12px; color: #999; }
+  </style>
+</head>
+<body>
+  <h1>Zen Tab Sorter</h1>
+  <p class="subtitle">Settings</p>
+
+  <h2>Sorting</h2>
+
+  <div class="setting">
+    <label>
+      <input type="checkbox" id="groupByDomain">
+      Group tabs by domain
+    </label>
+    <p class="description">Tabs from the same domain will be grouped together. Requires tab groups support.</p>
+  </div>
+
+  <div class="setting">
+    <label>
+      <input type="checkbox" id="sortWithinGroups">
+      Sort within groups
+    </label>
+    <p class="description">Sort tabs alphabetically by title within each domain group.</p>
+  </div>
+
+  <div class="setting">
+    <label>
+      <input type="checkbox" id="sortGroupsAlphabetically">
+      Sort groups alphabetically
+    </label>
+    <p class="description">Sort tab groups by their title.</p>
+  </div>
+
+  <h2>Maintenance</h2>
+
+  <div class="setting">
+    <label>
+      <input type="checkbox" id="removeDuplicates">
+      Remove duplicate tabs
+    </label>
+    <p class="description">When sorting, close duplicate tabs. Pinned tabs are preserved.</p>
+  </div>
+
+  <h2>Shortcuts</h2>
+
+  <div class="setting">
+    <label>
+      <input type="checkbox" id="sortOnShortcut">
+      Enable Alt+S shortcut
+    </label>
+    <p class="description">Press Alt+S to sort all tabs in the current window.</p>
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <div class="footer">
+    Changes are saved automatically. Some settings require reloading tabs to take effect.
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

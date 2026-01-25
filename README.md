@@ -12,6 +12,7 @@ Keyboard shortcut: press `Alt+S` to sort all tabs and groups by domain, then by 
 ## Install the calm
 
 - Firefox Add-ons: [addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter](https://addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter/)
+- GitHub: [https://github.com/AntonDobrovinskiy/Zen-Tab-Sorter](https://github.com/AntonDobrovinskiy/Zen-Tab-Sorter)
 
 ## Features (brief, like your attention span)
 
