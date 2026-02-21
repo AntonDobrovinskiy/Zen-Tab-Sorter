@@ -288,3 +288,11 @@ browser.commands.onCommand.addListener(async (command) => {
     await sortTabsInWindow(w.id);
   } catch (err) { /* Ignore errors. */ }
 });
+
+// Listen for clicks on the extension icon.
+browser.browserAction.onClicked.addListener(async () => {
+  try {
+    const w = await browser.windows.getCurrent();
+    await sortTabsInWindow(w.id);
+  } catch (err) { /* Ignore errors. */ }
+});

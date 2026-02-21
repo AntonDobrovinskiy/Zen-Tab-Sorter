@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Zen Tab Sorter",
-  "version": "2.6",
+  "version": "2.7",
   "description": "Sorts tabs by domain and title. Hotkey: Alt+S.",
   "permissions": ["tabs", "tabGroups", "storage"],
   "background": {
@@ -21,7 +21,7 @@
     "96": "icons/icon-96.png"
   },
   "browser_action": {
-    "default_title": "Sort all tabs (Alt+S) — Click for settings",
+    "default_title": "Sort all tabs (Alt+S) — Right-click for settings",
     "default_icon": {
       "48": "icons/icon-48.png",
       "96": "icons/icon-96.png"

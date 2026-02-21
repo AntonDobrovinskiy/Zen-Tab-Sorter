@@ -9,6 +9,8 @@ Tabs everywhere? Breathe in, breathe out — and let Zen Tab Sorter line them up
 
 Keyboard shortcut: press `Alt+S` to sort all tabs and groups by domain, then by title.
 
+Or simply click the extension icon in the toolbar for instant zen. Right-click for settings.
+
 ## Install the calm
 
 - Firefox Add-ons: [addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter](https://addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter/)
