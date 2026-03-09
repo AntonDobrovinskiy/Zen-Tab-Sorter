@@ -72,6 +72,27 @@ function normalizeUrl(rawUrl) {
 }
 
 /**
+ * Cleans a title string for consistent sorting.
+ * Removes common notification patterns like "(20)", "*NEW*", "[UNREAD]", etc.
+ * @param {string} title - The raw title string.
+ * @returns {string} Cleaned title for comparison.
+ */
+function cleanTitle(title) {
+  if (!title) return "";
+  return title
+    // YouTube and similar: (20), (1,234), (100万)
+    .replace(/\s*\(\d+(,\d+)*(\.\d+)?(万|千)?\)\s*/g, " ")
+    // Square bracket notifications: [5], [NEW], [UNREAD]
+    .replace(/\s*\[[^\]]*\]\s*/g, " ")
+    // Asterisk patterns: *NEW*, *UNREAD*
+    .replace(/\s*\*[^*]*\*\s*/g, " ")
+    // Leading numbers with dots: 1. Title, 20 - Title
+    .replace(/^\d+[\.\-]\s*/, "")
+    // Extra whitespace
+    .trim();
+}
+
+/**
  * Reusable tab sorter: sorts by host, then by title.
  * @param {object} a - First tab.
  * @param {object} b - Second tab.
@@ -82,7 +103,9 @@ function compareTabs(a, b) {
   const hostB = getHost(b);
   const hostCompare = hostA.localeCompare(hostB, undefined, { sensitivity: "base" });
   if (hostCompare !== 0) return hostCompare;
-  return (a.title || "").localeCompare(b.title || "", undefined, { sensitivity: "base" });
+  const titleA = cleanTitle(a.title);
+  const titleB = cleanTitle(b.title);
+  return titleA.localeCompare(titleB, undefined, { sensitivity: "base" });
 }
 
 /**
