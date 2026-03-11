@@ -1,0 +1,1 @@
+- [ ] Firefox split view doesnt respected
