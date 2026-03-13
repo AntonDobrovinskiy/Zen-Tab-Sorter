@@ -207,7 +207,8 @@ async function sortTabsInWindow(windowId) {
     const ungroupedTabs = [];
 
     for (const tab of unpinned) {
-      if (tab.groupId && tab.groupId !== browser.tabGroups.TAB_GROUP_ID_NONE && groupData.has(tab.groupId)) {
+      const isGrouped = tab.groupId && tab.groupId !== browser.tabGroups.TAB_GROUP_ID_NONE && groupData.has(tab.groupId);
+      if (isGrouped) {
         groupData.get(tab.groupId).tabs.push(tab);
       } else {
         ungroupedTabs.push(tab);
@@ -232,22 +233,39 @@ async function sortTabsInWindow(windowId) {
     // Sort ungrouped tabs.
     ungroupedTabs.sort(compareTabs);
 
-    // Execute moves.
-    let currentIndex = pinned.length;
+    // Build the final ordered list of all tab IDs
+    const finalOrder = [];
 
-    // Move grouped tabs.
+    // Add grouped tabs in sorted group order
+    for (const data of sortedGroups) {
+      if (data.tabs.length > 0) {
+        finalOrder.push(...data.tabs.map(t => t.id));
+      }
+    }
+
+    // Add ungrouped tabs
+    finalOrder.push(...ungroupedTabs.map(t => t.id));
+
+    // Move all tabs in a single batch operation
+    // This avoids the index shifting problem
+    try {
+      await browser.tabs.move(finalOrder, { index: pinned.length });
+    } catch (e) {
+      // Fall back to individual moves if batch fails
+      let currentIndex = pinned.length;
+      for (const tabId of finalOrder) {
+        try {
+          await browser.tabs.move(tabId, { index: currentIndex });
+          currentIndex++;
+        } catch (e2) { /* Ignore move errors. */ }
+      }
+    }
+
+    // Re-group tabs that belong to groups
     for (const data of sortedGroups) {
       if (data.tabs.length === 0) continue;
 
       const tabIds = data.tabs.map(t => t.id);
-
-      for (const tabId of tabIds) {
-        try {
-          await browser.tabs.move(tabId, { index: currentIndex });
-          currentIndex++;
-        } catch (e) { /* Tab closed during process. */ }
-      }
-
       try {
         await browser.tabs.group({ tabIds, groupId: data.group.id });
       } catch (e) {
@@ -256,14 +274,6 @@ async function sortTabsInWindow(windowId) {
           await browser.tabGroups.update(newGroupId, { title: data.group.title });
         } catch (e2) { /* Grouping failed. */ }
       }
-    }
-
-    // Move ungrouped tabs.
-    for (const tab of ungroupedTabs) {
-      try {
-        await browser.tabs.move(tab.id, { index: currentIndex });
-        currentIndex++;
-      } catch (e) { /* Tab closed. */ }
     }
 
     return { status: "sorted" };
@@ -287,12 +297,18 @@ async function sortUngroupedTabs(tabs, pinnedCount) {
     return { status: "already_sorted" };
   }
 
-  let targetIndex = pinnedCount;
-  for (const tab of sorted) {
-    try {
-      await browser.tabs.move(tab.id, { index: targetIndex });
-      targetIndex++;
-    } catch (err) { /* Ignore move errors. */ }
+  // Batch move all tabs at once
+  try {
+    await browser.tabs.move(sortedOrderIds, { index: pinnedCount });
+  } catch (e) {
+    // Fall back to individual moves if batch fails
+    let targetIndex = pinnedCount;
+    for (const tabId of sortedOrderIds) {
+      try {
+        await browser.tabs.move(tabId, { index: targetIndex });
+        targetIndex++;
+      } catch (err) { /* Ignore move errors. */ }
+    }
   }
   return { status: "sorted" };
 }
