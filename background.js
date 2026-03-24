@@ -80,6 +80,8 @@ function normalizeUrl(rawUrl) {
 function cleanTitle(title) {
   if (!title) return "";
   return title
+    // Remove emojis and emoji sequences
+    .replace(/\p{Extended_Pictographic}/gu, "")
     // YouTube and similar: (20), (1,234), (100万)
     .replace(/\s*\(\d+(,\d+)*(\.\d+)?(万|千)?\)\s*/g, " ")
     // Square bracket notifications: [5], [NEW], [UNREAD]

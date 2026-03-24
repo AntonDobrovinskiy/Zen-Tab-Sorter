@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Zen Tab Sorter",
-  "version": "2.9",
+  "version": "2.91",
   "description": "Sorts tabs by domain and title. Hotkey: Alt+S.",
   "permissions": ["tabs", "tabGroups", "storage"],
   "background": {
