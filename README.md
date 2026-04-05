@@ -13,7 +13,7 @@ Or simply click the extension icon in the toolbar for instant zen. Right-click f
 
 ## Install the calm
 
-- Firefox Add-ons: []()
+- [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/zen-tab-sorter/)
 
 ## Features (brief, like your attention span)
 
