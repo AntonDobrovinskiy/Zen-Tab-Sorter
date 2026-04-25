@@ -12,13 +12,13 @@ let settings = { ...defaults };
 
 // Load settings from storage
 async function loadSettings() {
-  try {
-    const stored = await browser.storage.local.get(null);
-    settings = { ...defaults, ...stored };
-    applySettingsToUI();
-  } catch (e) {
-    showStatus("Failed to load settings", "error");
-  }
+  return new Promise((resolve) => {
+    chrome.storage.local.get(null, (stored) => {
+      settings = { ...defaults, ...stored };
+      applySettingsToUI();
+      resolve();
+    });
+  });
 }
 
 // Apply settings to UI controls
@@ -31,18 +31,15 @@ function applySettingsToUI() {
 
 // Save settings to storage
 async function saveSettings() {
-  try {
-    // Update settings from UI
-    for (const key of Object.keys(defaults)) {
-      const el = document.getElementById(key);
-      if (el) settings[key] = el.checked;
-    }
-
-    await browser.storage.local.set(settings);
-    showStatus("Settings saved", "success");
-  } catch (e) {
-    showStatus("Failed to save settings", "error");
+  // Update settings from UI
+  for (const key of Object.keys(defaults)) {
+    const el = document.getElementById(key);
+    if (el) settings[key] = el.checked;
   }
+
+  chrome.storage.local.set(settings, () => {
+    showStatus("Settings saved", "success");
+  });
 }
 
 // Show status message

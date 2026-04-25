@@ -1,4 +1,4 @@
-// Zen Tab Sorter — Main background script
+// Zen Tab Sorter — Main background script (Chrome/Edge compatible)
 
 /**
  * Extracts a meaningful "effective" hostname from a full hostname.
@@ -82,8 +82,8 @@ function cleanTitle(title) {
   return title
     // Remove emojis and emoji sequences
     .replace(/\p{Extended_Pictographic}/gu, "")
-    // YouTube and similar: (20), (1,234), (100万)
-    .replace(/\s*\(\d+(,\d+)*(\.\d+)?(万|千)?\)\s*/g, " ")
+    // YouTube and similar: (20), (1,234), (100 万)
+    .replace(/\s*\(\d+(,\d+)*(\.\d+)?(万 | 千)?\)\s*/g, " ")
     // Square bracket notifications: [5], [NEW], [UNREAD]
     .replace(/\s*\[[^\]]*\]\s*/g, " ")
     // Asterisk patterns: *NEW*, *UNREAD*
@@ -122,12 +122,11 @@ async function getSettings() {
     sortWithinGroups: true,
     sortGroupsAlphabetically: true,
   };
-  try {
-    const stored = await browser.storage.local.get(null);
-    return { ...defaults, ...stored };
-  } catch (e) {
-    return defaults;
-  }
+  return new Promise((resolve) => {
+    chrome.storage.local.get(null, (stored) => {
+      resolve({ ...defaults, ...stored });
+    });
+  });
 }
 
 /**
@@ -136,7 +135,7 @@ async function getSettings() {
  */
 async function removeDuplicateTabs(windowId) {
   try {
-    const tabs = await browser.tabs.query({ windowId });
+    const tabs = await chrome.tabs.query({ windowId });
     const urlToTabs = new Map();
 
     for (const tab of tabs) {
@@ -171,7 +170,7 @@ async function removeDuplicateTabs(windowId) {
 
     if (toClose.length > 0) {
       try {
-        await browser.tabs.remove(toClose);
+        await chrome.tabs.remove(toClose);
       } catch (err) { /* Tab already closed. */ }
     }
   } catch (err) { /* Ignore query errors. */ }
@@ -189,11 +188,11 @@ async function sortTabsInWindow(windowId) {
       await removeDuplicateTabs(windowId);
     }
 
-    const allTabs = await browser.tabs.query({ windowId });
+    const allTabs = await chrome.tabs.query({ windowId });
     const pinned = allTabs.filter((t) => t.pinned);
     const unpinned = allTabs.filter((t) => !t.pinned);
 
-    const supportsTabGroups = typeof browser.tabGroups !== "undefined";
+    const supportsTabGroups = typeof chrome.tabGroups !== "undefined";
 
     if (!supportsTabGroups || !settings.groupByDomain) {
       return await sortUngroupedTabs(unpinned, pinned.length);
@@ -202,14 +201,14 @@ async function sortTabsInWindow(windowId) {
     // --- Tab Groups Mode ---
 
     // Collect all groups and distribute tabs.
-    const groups = await browser.tabGroups.query({ windowId });
+    const groups = await chrome.tabGroups.query({ windowId });
     const groupData = new Map();
     groups.forEach(g => groupData.set(g.id, { group: g, tabs: [] }));
 
     const ungroupedTabs = [];
 
     for (const tab of unpinned) {
-      const isGrouped = tab.groupId && tab.groupId !== browser.tabGroups.TAB_GROUP_ID_NONE && groupData.has(tab.groupId);
+      const isGrouped = tab.groupId !== undefined && tab.groupId !== -1 && groupData.has(tab.groupId);
       if (isGrouped) {
         groupData.get(tab.groupId).tabs.push(tab);
       } else {
@@ -251,13 +250,13 @@ async function sortTabsInWindow(windowId) {
     // Move all tabs in a single batch operation
     // This avoids the index shifting problem
     try {
-      await browser.tabs.move(finalOrder, { index: pinned.length });
+      await chrome.tabs.move(finalOrder, { index: pinned.length });
     } catch (e) {
       // Fall back to individual moves if batch fails
       let currentIndex = pinned.length;
       for (const tabId of finalOrder) {
         try {
-          await browser.tabs.move(tabId, { index: currentIndex });
+          await chrome.tabs.move(tabId, { index: currentIndex });
           currentIndex++;
         } catch (e2) { /* Ignore move errors. */ }
       }
@@ -269,11 +268,11 @@ async function sortTabsInWindow(windowId) {
 
       const tabIds = data.tabs.map(t => t.id);
       try {
-        await browser.tabs.group({ tabIds, groupId: data.group.id });
+        await chrome.tabs.group({ tabIds, groupId: data.group.id });
       } catch (e) {
         try {
-          const newGroupId = await browser.tabs.group({ tabIds });
-          await browser.tabGroups.update(newGroupId, { title: data.group.title });
+          const newGroupId = await chrome.tabs.group({ tabIds });
+          await chrome.tabGroups.update(newGroupId, { title: data.group.title });
         } catch (e2) { /* Grouping failed. */ }
       }
     }
@@ -301,13 +300,13 @@ async function sortUngroupedTabs(tabs, pinnedCount) {
 
   // Batch move all tabs at once
   try {
-    await browser.tabs.move(sortedOrderIds, { index: pinnedCount });
+    await chrome.tabs.move(sortedOrderIds, { index: pinnedCount });
   } catch (e) {
     // Fall back to individual moves if batch fails
     let targetIndex = pinnedCount;
     for (const tabId of sortedOrderIds) {
       try {
-        await browser.tabs.move(tabId, { index: targetIndex });
+        await chrome.tabs.move(tabId, { index: targetIndex });
         targetIndex++;
       } catch (err) { /* Ignore move errors. */ }
     }
@@ -318,22 +317,22 @@ async function sortUngroupedTabs(tabs, pinnedCount) {
 // --- Event Listeners ---
 
 // Listen for the Alt+S shortcut.
-browser.commands.onCommand.addListener(async (command) => {
+chrome.commands.onCommand.addListener(async (command) => {
   if (command !== "sort-tabs") return;
 
   const settings = await getSettings();
   if (!settings.sortOnShortcut) return;
 
   try {
-    const w = await browser.windows.getCurrent();
+    const w = await chrome.windows.getCurrent();
     await sortTabsInWindow(w.id);
   } catch (err) { /* Ignore errors. */ }
 });
 
 // Listen for clicks on the extension icon.
-browser.browserAction.onClicked.addListener(async () => {
+chrome.action.onClicked.addListener(async () => {
   try {
-    const w = await browser.windows.getCurrent();
+    const w = await chrome.windows.getCurrent();
     await sortTabsInWindow(w.id);
   } catch (err) { /* Ignore errors. */ }
 });
