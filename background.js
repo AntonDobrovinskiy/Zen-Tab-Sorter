@@ -192,10 +192,17 @@ async function sortTabsInWindow(windowId) {
     const pinned = allTabs.filter((t) => t.pinned);
     const unpinned = allTabs.filter((t) => !t.pinned);
 
+    // Zen keeps hidden internal elements between pinned and normal tabs,
+    // so the first normal tab is not always at index pinned.length.
+    // Zen silently ignores moves into that range, so use the real index.
+    const startIndex = unpinned.length > 0
+      ? Math.min(...unpinned.map((t) => t.index))
+      : pinned.length;
+
     const supportsTabGroups = typeof chrome.tabGroups !== "undefined";
 
     if (!supportsTabGroups || !settings.groupByDomain) {
-      return await sortUngroupedTabs(unpinned, pinned.length);
+      return await sortUngroupedTabs(unpinned, startIndex);
     }
 
     // --- Tab Groups Mode ---
@@ -250,10 +257,10 @@ async function sortTabsInWindow(windowId) {
     // Move all tabs in a single batch operation
     // This avoids the index shifting problem
     try {
-      await chrome.tabs.move(finalOrder, { index: pinned.length });
+      await chrome.tabs.move(finalOrder, { index: startIndex });
     } catch (e) {
       // Fall back to individual moves if batch fails
-      let currentIndex = pinned.length;
+      let currentIndex = startIndex;
       for (const tabId of finalOrder) {
         try {
           await chrome.tabs.move(tabId, { index: currentIndex });
@@ -286,9 +293,9 @@ async function sortTabsInWindow(windowId) {
 /**
  * Sorts ungrouped tabs (no tab groups support or disabled).
  * @param {Array<object>} tabs - Array of unpinned tab objects.
- * @param {number} pinnedCount - Number of pinned tabs.
+ * @param {number} startIndex - Index of the first unpinned tab.
  */
-async function sortUngroupedTabs(tabs, pinnedCount) {
+async function sortUngroupedTabs(tabs, startIndex) {
   const sorted = [...tabs].sort(compareTabs);
 
   const currentOrderIds = tabs.map((t) => t.id);
@@ -300,10 +307,10 @@ async function sortUngroupedTabs(tabs, pinnedCount) {
 
   // Batch move all tabs at once
   try {
-    await chrome.tabs.move(sortedOrderIds, { index: pinnedCount });
+    await chrome.tabs.move(sortedOrderIds, { index: startIndex });
   } catch (e) {
     // Fall back to individual moves if batch fails
-    let targetIndex = pinnedCount;
+    let targetIndex = startIndex;
     for (const tabId of sortedOrderIds) {
       try {
         await chrome.tabs.move(tabId, { index: targetIndex });
